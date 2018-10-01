@@ -1,17 +1,19 @@
 <?php
 require_once( ABSPATH . "wp-includes/pluggable.php" );
+/**
+ * Plugin Name:     WP-Brew DevTool
+ * Plugin URI:      https://www.rawlemurdy.com
+ * Description:     Specific functions used by WP-Brew <b>NOT TO BE USED IN PRODUCTION</b>.
+ * Author:          Rawle Murdy Associates
+ * Author URI:      https://www.rawlemurdy.com
+ * Version:         0.0.9
+ *
+ * @package         wpb
+ * @since           20190929
+ * @author          lpeterson
+ */
 
-/*
-
-Plugin Name: ValetPress functions
-Plugin URI: https://systmweb.com
-Description: Specific functions used by ValetPress, do NOT use this in production.
-Version: 1.0
-Author: sdenike
-AuthorURI: https://systmweb.com
-*/
-
-function vp_header_function() {
+function wpb_header_function() {
 	echo '<meta http-equiv="x-dns-prefetch-control" content="on"/>
 		<link rel="dns-prefetch" href="//www.google-analytics.com"/>
 		<link rel="dns-prefetch" href="//fonts.googleapis.com"/>
@@ -23,10 +25,10 @@ function vp_header_function() {
 ';
 }
 
-add_action('wp_head','vp_header_function');
+add_action('wp_head','wpb_header_function');
 
 //* Enable GZIP compression function
-function vp_http_compression() {
+function wpb_http_compression() {
 	// Dont use on Admin HTML editor
 	if (stripos($uri, '/js/tinymce') !== false)
 		return false;
@@ -39,22 +41,22 @@ function vp_http_compression() {
 	if (extension_loaded('zlib'))
 			if(!ob_start("ob_gzhandler")) ob_start();
 }
-add_action('init', 'vp_http_compression');
+add_action('init', 'wpb_http_compression');
 
 //* Remove JS/CSS versions
-function vp_remove_cssjs_ver( $src ) {
+function wpb_remove_cssjs_ver( $src ) {
 	if( strpos( $src, '?ver=' ) )
 		$src = remove_query_arg( 'ver', $src );
 	return $src;
 }
-add_filter( 'style_loader_src', 'vp_remove_cssjs_ver', 1000 );
-add_filter( 'script_loader_src', 'vp_remove_cssjs_ver', 1000 );
+add_filter( 'style_loader_src', 'wpb_remove_cssjs_ver', 1000 );
+add_filter( 'script_loader_src', 'wpb_remove_cssjs_ver', 1000 );
 
 //* Remove WP Version from header and feed
-function vp_remove_version() {
+function wpb_remove_version() {
 	return '';
 }
-add_filter('the_generator', 'vp_remove_version');
+add_filter('the_generator', 'wpb_remove_version');
 
 //* Reduce image resolution
 add_filter('jpeg_quality', function($arg){return 80;});
@@ -62,7 +64,7 @@ add_filter('jpeg_quality', function($arg){return 80;});
 // Sharpen resized jpeg images
 // http://wpsnipp.com/index.php/functions-php/sharpen-resized-wordpress-uploaded-images-jpg/#
 
-function vp_sharpen_resized_file( $resized_file ) {
+function wpb_sharpen_resized_file( $resized_file ) {
     $image = wp_load_image( $resized_file );
     if ( !is_resource( $image ) )
         return new WP_Error( 'error_loading_image', $image, $file );
@@ -89,15 +91,9 @@ function vp_sharpen_resized_file( $resized_file ) {
     }
     return $resized_file;
 }
-add_filter('image_make_intermediate_size', 'vp_sharpen_resized_file',900);
+add_filter('image_make_intermediate_size', 'wpb_sharpen_resized_file',900);
 
-/**
- * Plugin Name: PJ Transient Cleaner
- * Description: Cleans expired transients behind the scenes.
- * Plugin URI: http://pressjitsu.com
-*/
-
-class Pj_Transient_Cleaner {
+class wpb_Transient_Cleaner {
        	public static function load() {
        		add_action( 'init', array( __CLASS__, 'schedule_events' ) );
        	}
@@ -151,18 +147,16 @@ class Pj_Transient_Cleaner {
        	}
 }
 
-Pj_Transient_Cleaner::load();
+wpb_Transient_Cleaner::load();
 
 // Add Livereload.js to header function
-function vp_livereload_add() {
-?>
-	<script src="<?php echo get_site_url();?>:35729/livereload.js?snipver=2" type="text/javascript" defer=""></script>
-<?php
-}
-add_action('wp_head', 'vp_livereload_add');
+function wpb_livereload_add() { ?>
+  <script src="<?php echo get_site_url();?>:35729/livereload.js?snipver=2" type="text/javascript" defer=""></script>
+<?php }
+add_action('wp_head', 'wpb_livereload_add');
 
 // Auto login function
-function vp_auto_login() {
+function wpb_auto_login() {
 	if ( $GLOBALS['pagenow'] === 'wp-login.php' && $_REQUEST['loggedout'] != 'true' ) {
 		$creds = array(
 			'user_login'    => 'admin',
@@ -174,4 +168,4 @@ function vp_auto_login() {
 		wp_redirect( $redirect_url );
 	}
 }
-add_action( 'after_setup_theme', 'vp_auto_login', 10, 2 );
+add_action( 'after_setup_theme', 'wpb_auto_login', 10, 2 );

@@ -1,5 +1,5 @@
 #!/bin/bash
-version="2018.09.07.1"
+version="2018.09.30"
 
 # Added for debugging
 set -euo pipefail
@@ -43,13 +43,13 @@ wordpress_installer () {
 define( 'WP_DEBUG', false );
 define( 'WP_DEBUG_LOG', false );
 define( 'FS_METHOD', 'direct' );
-define( 'WP_SITEURL', 'http://$project_name.$valet_domain/' );
-define( 'WP_HOME', 'http://$project_name.$valet_domain/' );
+define( 'WP_SITEURL', 'http://$project_name.$wpb_domain/' );
+define( 'WP_HOME', 'http://$project_name.$wpb_domain/' );
 PHP
 	green "wp-config.php has been generated."
 	wp db create --quiet
 	green "Database created."
-	wp core install --url="$project_name"."$valet_domain" --title="$project_name"."$valet_domain" --admin_user="$wp_admin_user" --admin_password="$wp_admin_password" --admin_email="$wp_admin_email" --quiet
+	wp core install --url="$project_name"."$wpb_domain" --title="$project_name"."$wpb_domain" --admin_user="$wp_admin_user" --admin_password="$wp_admin_password" --admin_email="$wp_admin_email" --quiet
 	green "WordPress has been installed."
 	cd "$sites_folder"/"$project_name"/
 }
@@ -57,17 +57,17 @@ PHP
 # Output WordPress login info
 wordpress_login_info () {
 	white "==================================================================="
-	green "Project Created: http://$project_name.$valet_domain/"
-	cyan "Login: http://$project_name.$valet_domain/wp-login.php"
+	green "Project Created: http://$project_name.$wpb_domain/"
+	cyan "Login: http://$project_name.$wpb_domain/wp-login.php"
 	cyan "Username: $wp_admin_user"
 	cyan "Password: $wp_admin_password"
 	if [ "$open_browser" = 1 ]; then
-		open -a "$browser" -g http://$project_name.$valet_domain/wp-login.php
+		open -a "$browser" -g http://$project_name.$wpb_domain/wp-login.php
 	fi
 	if [ "$livereload" = 1 ]; then
 		yellow "Added to LiveReload."
 		open "livereload:add?path="$sites_folder"/"$project_name"/"
-	fi	
+	fi
 	echo " "
 }
 
@@ -84,38 +84,38 @@ plugin_activation () {
 	        red "Removing plugins."
 			echo $plugins_remove | xargs wp plugin delete --quiet
 			red "$plugins_remove removed from install"
-	fi 
+	fi
 	# Activate all installed plugins
 	wp plugin activate --all --quiet
 	green "Plugins have been activated."
 }
 
-# Get ValetPress install directory
-vp_path="$(cd "$(dirname "$0")" && pwd)"
+# Get WP-Brew install directory
+wpb_path="$(cd "$(dirname "$0")" && pwd)"
 
 # Get config variables
-wp_admin_user=$(cat $vp_path/config.json|jq -r .wp_admin_user)
-wp_admin_email=$(cat $vp_path/config.json|jq -r .wp_admin_email)
-wp_admin_password=$(cat $vp_path/config.json|jq -r .wp_admin_password)
-sites_folder=$(cat $vp_path/config.json|jq -r .sites_folder)
-open_browser=$(cat $vp_path/config.json|jq -r .open_browser)
-browser=$(cat $vp_path/config.json|jq -r .browser)
-valet_domain=$(cat $vp_path/config.json|jq -r .valet_domain)
-plugins_add=$(cat $vp_path/config.json|jq -r .plugins_add)
-plugins_remove=$(cat $vp_path/config.json|jq -r .plugins_remove)
-livereload=$(cat $vp_path/config.json|jq -r .livereload)
+wp_admin_user=$(cat $wpb_path/config.json|jq -r .wp_admin_user)
+wp_admin_email=$(cat $wpb_path/config.json|jq -r .wp_admin_email)
+wp_admin_password=$(cat $wpb_path/config.json|jq -r .wp_admin_password)
+sites_folder=$(cat $wpb_path/config.json|jq -r .sites_folder)
+open_browser=$(cat $wpb_path/config.json|jq -r .open_browser)
+browser=$(cat $wpb_path/config.json|jq -r .browser)
+wpb_domain=$(cat $wpb_path/config.json|jq -r .wpb_domain)
+plugins_add=$(cat $wpb_path/config.json|jq -r .plugins_add)
+plugins_remove=$(cat $wpb_path/config.json|jq -r .plugins_remove)
+livereload=$(cat $wpb_path/config.json|jq -r .livereload)
 
-# ValetPress Commands
+# WP-Brew Commands
 if [ $# -lt 1 ] || [ "$1" = "help" ] || [ -z "$1" ];then
 	clear
-	white "ValetPress $version"
-	cyan "  vp create - Create fresh WordPress install. "
-	cyan "  vp delete - Delete an existing WordPress project. "
-	cyan "  vp help   - Display ValetPress help screen. "
+	white "WP-Brew $version"
+	cyan "  wpb create - Create fresh WordPress install. "
+	cyan "  wpb delete - Delete an existing WordPress project. "
+	cyan "  wpb help   - Display WP-Brew help screen. "
 	echo " "
 	exit 1;
 else
-	# ValetPress create option
+	# WP-Brew create option
 	if [ "$1" = "create" ]; then
 		white "Please enter the name of your project."
 		read -p ": " -r project_name
@@ -146,11 +146,11 @@ else
 				wp core download --quiet
 				green "WordPress have been downloaded."
 				wordpress_installer
-				cp -R $vp_path/plugins/ $sites_folder/$project_name/wp-content/plugins/
+				cp -R $wpb_path/plugins/ $sites_folder/$project_name/wp-content/plugins/
 				plugin_activation
 				wordpress_login_info
 			fi
-			
+
 			# WordPress install with specific theme
 			if [ "$create_choice" = 2 ]; then
 				yellow "Theme Location eg ~/Downloads/theme.zip "
@@ -161,17 +161,17 @@ else
 				mkdir $sites_folder/"$project_name"/wp-content/plugins/
 				wordpress_installer
 				wp theme install $theme_location --activate
-				cp -R $vp_path/plugins/ $sites_folder/$project_name/wp-content/plugins/
+				cp -R $wpb_path/plugins/ $sites_folder/$project_name/wp-content/plugins/
 				plugin_activation
 				wordpress_login_info
-			fi	
+			fi
 	fi
 
-	# ValetPress delete option
+	# WP-Brew delete option
 	if [ "$1" = "delete" ]; then
 		if [ "$(ls -A "$sites_folder")" ]; then
 			cd "$sites_folder"
-			red "ValetPress, delete a project "
+			red "WP-Brew, delete a project "
 			ls -d */ | cut -f1 -d'/'
 			cyan "Project that you wish to delete"
 			read -r project_name
@@ -183,7 +183,7 @@ else
 				if [ "$livereload" = 1 ]; then
 					red "Removing from LiveReload"
 					open "livereload:remove?path="$sites_folder"/"$project_name"/"
-				fi	
+				fi
 				cd "$project_name"
 				wp db drop --yes --quiet
 				red "Database has been dropped."
@@ -191,7 +191,7 @@ else
 				rm -rf "$project_name"
 				red "Project files deleted."
 				green "Success: $project_name deleted"
-			fi	 
+			fi
 		else
 			magenta "No WordPress installs detected. "
 		fi
