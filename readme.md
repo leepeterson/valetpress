@@ -1,69 +1,83 @@
 # WP-Brew
 
-WP-Brew allows for the quick installation and configuration of WordPress install for local development and testing. The idea of this script was inspired from the script that @AaronRutley originally created (https://github.com/AaronRutley/valetpress), but has been written from the ground up to provide cleaner code, as well as adding/removing features that I felt were or were not necessary for my daily usage.
+Quickly install and configure macOS 10.12+ for local WordPress development with WP-Brew, built for Mac minimalists. Inspired by [ValetPress](https://github.com/SystmWeb/valetpress), rewritten to suit very opinionated needs.
 
 ## What?
 
-The script itself uses Laravel Valet and WP-CLI to speed up the creation of a WordPress install on your local system.  Before @AaronRutley demoed his script to me I was using MAMP, and/or manually setting up installs on my computer which was far more time consuming than his script was.
+WP-Brew uses [Laravel Valet](https://laravel.com/docs/valet) and [WP-CLI](https://wp-cli.org/) to speed up the creation of a WordPress install on your local system. WP-Brew configures your Mac to always run Nginx in the background when your machine starts and with the help of Dnsmasq, all requests on the `*.test` TLD are proxied to point to sites installed on your local machine which run the latest version of PHP via PHP-FPM, backed by MariaDB, encrypted with TLS using HTTP/2.
 
 ## Why?
 
-While the original script works great… I got bored and decided to rewrite it for my own needs.
+Because, sometimes, running a full virtual machine is simply overkill. No Vagrant. No Apache. No fuss.
 
 ## Features
 
-- Create a fresh WordPress site in a few seconds
-- Download, Install and activate WordPress
-- Auto login to the new WordPress install
-- Easily delete the WordPress install(s)
+- Download, install and activate a fresh WordPress site in a few seconds
+- Run WordPress on your Mac using as little as [7MB of RAM](https://laravel.com/docs/5.6/valet#introduction)
+- Modern web stack: Nginx, PHP 7.x, MariaDB, Dnsmasq, WP-CLI, Composer
 
 ## To install
-1. Setup Laravel Valet / MySQL [Instructions](https://laravel.com/docs/5.6/valet#installation)
-2. Download / Clone this repo into a directory such as `~/Scripts/valetpress`
-3. Include the `wpb` script in your `.bash_profile` or `.zshrc` file
-4. A Brewfile is included to help with the dependancies that are needed. `brew bundle`
-5. Update the `config.json` file to reflect your needed settings. (see the 'Config Explained' section below)
+
+1. Setup Laravel Valet [Instructions](https://laravel.com/docs/valet) (soon to be automated)
+2. Clone this repo into a directory (such as `~/Resources/WP-Brew`)
+2. Install [Homebrew](https://brew.sh) and run `brew bundle` from `~/Resources/WP-Brew`; a Brewfile is included to help install additional tools and dependencies (soon to be automated)
+4. Symlink `~/Resources/WP-Brew/bin/wpb` somewhere in your `$PATH` (soon to be automated)
+5. Duplicate `~/Resources/WP-Brew/config.sample.json` to `~/Resources/WP-Brew/config.json` and adjust as needed
+6. Install and activate the WP-Brew DevTool WordPress plugin for additional development functionality (not to be used as a stand-alone plugin in a production environment!)
 
 ## Available Commands:
 
 `wpb create`
 
-- Download WordPress into a directory like `~/Sites/myproject` as specified in the config.json
-- Setup the database called `myproject` & configure the install
-- Create a user `admin` with the password `password`
-- Have `myproject.test` running in just a few seconds
+- Download WordPress into a directory as specified in the config.json
+- Setup the database and configure the install
+- Create the user and password specified in config.json
 
 `wpb delete`
 
-- Lists all WP-Brew installations
-- Will ask for the name of the project you would like to delete
-- Ask you to confim that you wish to delete the project
-- Deletes the database for that project
-- Deletes the directory for that project
+- Lists available WP-Brew installations
+- Confim deletion of project — database, files and all — prior to execution
 
 `wpb help`
 
 - Will display a summary of available commands
 
+### Coming Soon
+
+`wpb park` - Register a directory as a path containing sites
+`wpb link` - Serve a single site from a directory
+`wpb unlink` - Destroy the symbolic link to a directory containing a site
+`wpb links` - See a listing of all linked directories/sites
+`wpb share` - Create a publicly-accessible URL of your local site using ngrok
+`wpb forget` - Remove a site from the "parked" directory list
+`wpb paths` - View all of your "parked" paths
+`wpb restart` - Restart the Valet daemon
+`wpb start` - Start the Valet daemon
+`wpb stop` - Stop the Valet daemon
+`wpb uninstall` - Uninstall the Valet daemon entirely
+`wpb secure` - Secure WordPress with SSL (encrypted TLS using HTTP/2 provided by mkcert)
+`wpb unsecure` - Destroy an SSL certificate and update https to http
+
+
 ## Config Explained
- - `wp_admin_email` is used as the admin email address for new WP installs.
- - `wp_admin_user` is used as the username for new WP installs. [If changed you must update the username in the auto-login plugin](https://github.com/sdenike/valetpress/blob/master/plugins/auto-login/auto-login.php#L18)
- - `wp_admin_password` is used as the password for new WP installs. [If changed you must update the password in the auto-login plugin](https://github.com/sdenike/valetpress/blob/master/plugins/auto-login/auto-login.php#L19)
- - `sites_folder` is a directory that you've run `valet park` in to serve sites.
- - `open_browser` if set to `1` a browser will auto open after the install completes, `0` will make so that it doesn't
- - `browser` you can set the default browser such as Safari, or Google Chrome, etc
- - `valet_domain` Default is set to `test` but you can change this to whatever you use for Valet, this can be adjusted by using `valet domain TLDTOUSE`
- - `plugins_add` Plugins that you wish to install/activate on each new install
- - `plugins_remove` Plugins that you wish to remove from the default installs
+
+- `wp_admin_email` is used as the admin email address for new WP installs.
+- `wp_admin_user` is used as the username for new WP installs. [If changed you must update the username in the auto-login plugin](https://github.com/sdenike/valetpress/blob/master/plugins/auto-login/auto-login.php#L18)
+- `wp_admin_password` is used as the password for new WP installs. [If changed you must update the password in the auto-login plugin](https://github.com/sdenike/valetpress/blob/master/plugins/auto-login/auto-login.php#L19)
+- `sites_folder` is a directory that you've run `valet park` in to serve sites.
+- `open_browser` if set to `1` a browser will auto open after the install completes, `0` will make so that it doesn't
+- `browser` you can set the default browser such as Safari, or Google Chrome, etc
+- `valet_domain` Default is set to `test` but you can change this to whatever you use for Valet, this can be adjusted by using `valet domain TLDTOUSE`
+- `plugins_add` Plugins that you wish to install/activate on each new install
+- `plugins_remove` Plugins that you wish to remove from the default installs
 
 ## Requirements
 
-Below you will find a list of all required system files in order for WP-Brew to proper work.
-
-- [Valet](https://laravel.com/docs/5.2/valet) - With out this sites will not load
-- MySQL or MariaDB - Needed for WordPress
-- [Homebrew](https://brew.sh) - Used for installing MySQL/PHP/etc
-- [jq](https://stedolan.github.io/jq/) - Used for reading the config file
-- [WP-CLI](https://wp-cli.org/) - Needed to complete WordPress installs.
-
-Note: You will need to add the WP-Brew directory to your $PATH in your `.bash_profile` or `.zshrc` so that you can run the `wpb` command from anywhere on your computer.
+- [Homebrew](https://brew.sh)
+- [Laravel Valet](https://laravel.com/docs/valet)
+- [Nginx Web Server](https://www.nginx.com)
+- [PHP Hypertext Preprocessor](http://php.net)
+- [MariaDB](https://mariadb.org) or [MySQL](https://www.mysql.com)
+- [Composer PHP Package Manager](https://getcomposer.org)
+- [WP-CLI](https://wp-cli.org)
+- [jq](https://stedolan.github.io/jq/)
