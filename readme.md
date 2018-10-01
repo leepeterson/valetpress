@@ -18,10 +18,10 @@ Because, sometimes, running a full virtual machine is simply overkill. No Vagran
 
 ## To install
 
-1. Setup Laravel Valet [Instructions](https://laravel.com/docs/valet) (soon to be automated)
-2. Clone this repo into a directory (such as `~/Resources/WP-Brew`)
-2. Install [Homebrew](https://brew.sh) and run `brew bundle` from `~/Resources/WP-Brew`; a Brewfile is included to help install additional tools and dependencies (soon to be automated)
-4. Symlink `~/Resources/WP-Brew/bin/wpb` somewhere in your `$PATH` (soon to be automated)
+1. Clone this repo into a directory such as `~/Resources/WP-Brew` (soon to become a Composer-installed package)
+2. Install [Homebrew](https://brew.sh) and run `brew bundle` from within `~/Resources/WP-Brew`; the included Brewfile will properly install everything needed by Valet, plus additional tools and dependencies (soon to be automated via bootstrap.sh/Makefile)
+3. Setup [Laravel Valet](https://laravel.com/docs/valet); all that should be needed is to run `composer global require laravel/valet` and to add `~/.composer/vendor/bin` to your `$PATH` (soon to be automated)
+4. Symlink `~/Resources/WP-Brew/bin/wpb` somewhere like `/usr/local/bin/wpb` (i.e. somewhere in your `$PATH`) (soon to be automated)
 5. Duplicate `~/Resources/WP-Brew/config.sample.json` to `~/Resources/WP-Brew/config.json` and adjust as needed
 6. Install and activate the WP-Brew DevTool WordPress plugin for additional development functionality (not to be used as a stand-alone plugin in a production environment!)
 
